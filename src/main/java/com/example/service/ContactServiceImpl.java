@@ -1,35 +1,40 @@
 package com.example.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
+import com.example.dto.ContactDto;
+import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@Component
+@Service
 public class ContactServiceImpl implements ContactService {
 
-    private final Resource resource;
+    private final Map<String, ContactDto> contacts = new HashMap<>();
 
-    public ContactServiceImpl(@Value("${contact.path}")Resource resource) {
-        this.resource = resource;
+    @Override
+    public List<ContactDto> findAll() {
+        return (ArrayList<ContactDto>) contacts.values();
     }
 
     @Override
-    public String findAll() {
-        try {
-            BufferedReader reader = new BufferedReader(
-                new InputStreamReader(resource.getInputStream())
-            );
-            StringBuilder sb = new StringBuilder();
+    public ContactDto findContactByPhone(String phone) {
+        return contacts.getOrDefault(phone, null);
+    }
 
-            reader.lines().forEach(line -> sb.append(line).append("\n"));
+    @Override
+    public ContactDto updateContactByPhone(String phone, ContactDto contactDto) {
+        return contacts.put(phone, contactDto);
+    }
 
-            return sb.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public ContactDto createContact(ContactDto contactDto) {
+        return contacts.put(contactDto.getPhone(), contactDto);
+    }
+
+    @Override
+    public void deleteContactByPhone(String phone) {
+        contacts.remove(phone);
     }
 }
