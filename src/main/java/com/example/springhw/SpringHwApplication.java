@@ -14,7 +14,7 @@ public class SpringHwApplication {
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(SpringHwApplication.class, args);
         ContactService service = context.getBean(ContactServiceImpl.class);
-        service.findAll();
+        System.out.println(service.findAll());
     }
 
 }
