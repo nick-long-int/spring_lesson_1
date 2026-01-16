@@ -11,16 +11,23 @@ import java.io.InputStreamReader;
 @Component
 public class ContactServiceImpl implements ContactService {
 
-    @Value("${contact.path}")
-    private Resource resource;
+    private final Resource resource;
+
+    public ContactServiceImpl(@Value("${contact.path}")Resource resource) {
+        this.resource = resource;
+    }
 
     @Override
-    public void findAll() {
+    public String findAll() {
         try {
             BufferedReader reader = new BufferedReader(
                 new InputStreamReader(resource.getInputStream())
             );
-            reader.lines().forEach(System.out::println);
+            StringBuilder sb = new StringBuilder();
+
+            reader.lines().forEach(line -> sb.append(line).append("\n"));
+
+            return sb.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
