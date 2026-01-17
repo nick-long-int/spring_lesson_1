@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.example.service", "com.example.config"})
+@ComponentScan(basePackages = {"com.example"})
 public class SpringHwApplication {
 
     public static void main(String[] args) {

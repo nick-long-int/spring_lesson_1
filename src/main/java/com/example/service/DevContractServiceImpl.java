@@ -4,39 +4,37 @@ import com.example.dto.ContactDto;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
-@Profile("prod")
-public class ContactServiceImpl implements ContactService {
-
-    private final Map<String, ContactDto> contacts = new HashMap<>();
-
+@Profile("dev")
+public class DevContractServiceImpl implements ContactService{
     @Override
     public List<ContactDto> findAll() {
-        return contacts.values().stream().toList();
+        System.out.println("In dev profile");
+        return List.of();
     }
 
     @Override
     public ContactDto findContactByPhone(String phone) {
-        return contacts.getOrDefault(phone, null);
+        System.out.println("In dev profile");
+        return null;
     }
 
     @Override
     public ContactDto updateContactByPhone(String phone, ContactDto contactDto) {
-        return contacts.put(phone, contactDto);
+        System.out.println("In dev profile");
+        return null;
     }
 
     @Override
     public ContactDto createContact(ContactDto contactDto) {
-        return contacts.put(contactDto.getPhone(), contactDto);
+        System.out.println("In dev profile");
+        return null;
     }
 
     @Override
     public void deleteContactByPhone(String phone) {
-        contacts.remove(phone);
+        System.out.println("In dev profile");
     }
 }
