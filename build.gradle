@@ -26,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     annotationProcessor('org.projectlombok:lombok')
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     // Source: https://mvnrepository.com/artifact/io.github.openfeign/feign-jackson
