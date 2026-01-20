@@ -1,22 +1,22 @@
 package com.example.service;
 
 import com.example.dto.ContactDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 @Profile("prod")
+@RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
 
-    private final Map<String, ContactDto> contacts = new HashMap<>();
-
+    private final Map<String, ContactDto> contacts;
     @Override
     public List<ContactDto> findAll() {
         return contacts.values().stream().toList();
@@ -25,11 +25,6 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Cacheable(value = "contacts", key = "#phone")
     public ContactDto findContactByPhone(String phone) {
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return contacts.getOrDefault(phone, null);
     }
 
