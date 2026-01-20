@@ -1,44 +1,98 @@
 package com.example.service;
 
 import com.example.dto.ContactDto;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ActiveProfiles("prod")
-@ContextConfiguration(classes = ContactServiceImpl.class, loader = AnnotationConfigContextLoader.class)
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@ContextConfiguration(classes = ContactServiceImpl.class)
+@ActiveProfiles("test")
+@DisplayName("Сервис контактов")
 class ContactServiceImplTest {
 
     private ContactService contactService;
 
     @BeforeEach
     void setUp(){
-        contactService = new ContactServiceImpl();
+        Map<String, ContactDto> contactMap = new HashMap<>();
+        ContactDto contactDto = new ContactDto();
+        contactDto.setPhone("7909");
+        contactDto.setFirstName("Test");
+        contactDto.setLastName("Test");
+        contactDto.setMiddleName("Test");
+
+        contactMap.put(contactDto.getPhone(), contactDto);
+
+        contactService = new ContactServiceImpl(contactMap);
     }
 
     @Test
-    void testFindByPhone(){
-
+    @DisplayName("Добавление контакта")
+    void testCreateContact() {
         ContactDto contactDto = new ContactDto();
-        contactDto.setFirstName("TEST");
-        contactDto.setLastName("Doe");
-        contactDto.setMiddleName("Doe");
-        contactDto.setPhone("7999");
+        contactDto.setPhone("Test");
 
         contactService.createContact(contactDto);
-
-        Assertions.assertEquals("TEST", contactService.findContactByPhone("7999").getFirstName());
-
+        assertEquals(2, contactService.findAll().size());
     }
 
     @Test
-    void testFindByPhoneWhereInstanceNotExist(){
+    @DisplayName("Удаление контакта")
+    void testDeleteContact() {
+        String phone = "7909";
 
-        Assertions.assertNull(contactService.findContactByPhone("7999"));
+        contactService.deleteContactByPhone(phone);
 
+        assertEquals(0, contactService.findAll().size());
+    }
+
+    @Test
+    @DisplayName("Обновление контакта")
+    void testUpdateContact() {
+        ContactDto contactDto = new ContactDto();
+        contactDto.setPhone("7999");
+        String phone = "7909";
+
+        ContactDto contact =
+            contactService.updateContactByPhone(phone, contactDto);
+
+        assertEquals(phone, contact.getPhone());
+    }
+
+    @Test
+    @DisplayName("Найти контакт по телефону")
+    void testFindByPhone() {
+        String phone = "7909";
+        String firstName = "Test";
+
+        ContactDto contactDto =
+            contactService.findContactByPhone(phone);
+
+        assertEquals(phone, contactDto.getPhone());
+        assertEquals(firstName, contactDto.getFirstName());
+    }
+
+    @Test
+    @DisplayName("Контакт не найден")
+    void testFindByPhoneWhenContactNotFound() {
+        String phone = "7908";
+
+        ContactDto contactDto =
+            contactService.findContactByPhone(phone);
+
+        assertNull(contactDto);
     }
 
 }
