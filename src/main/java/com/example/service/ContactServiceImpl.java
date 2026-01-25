@@ -5,14 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
 @Service
-@Profile("prod")
 @RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
 
@@ -23,25 +21,21 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    @Cacheable(value = "contacts", key = "#phone")
     public ContactDto findContactByPhone(String phone) {
         return contacts.getOrDefault(phone, null);
     }
 
     @Override
-    @CachePut(value = "contacts", key = "#phone")
     public ContactDto updateContactByPhone(String phone, ContactDto contactDto) {
         return contacts.put(phone, contactDto);
     }
 
     @Override
-    @CachePut(value = "contacts", key = "#contactDto.phone")
     public ContactDto createContact(ContactDto contactDto) {
         return contacts.put(contactDto.getPhone(), contactDto);
     }
 
     @Override
-    @CacheEvict(value = "products", key = "#phone")
     public void deleteContactByPhone(String phone) {
         contacts.remove(phone);
     }
