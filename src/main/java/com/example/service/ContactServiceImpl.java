@@ -1,39 +1,59 @@
 package com.example.service;
 
 import com.example.dto.ContactDto;
+import com.example.mapper.ContactMapper;
+import com.example.model.Contact;
+import com.example.repo.ContactRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
+    private final ContactRepository contactRepository;
+    private final ContactMapper contactMapper;
 
-    private final Map<String, ContactDto> contacts;
     @Override
     public List<ContactDto> findAll() {
-        return contacts.values().stream().toList();
+        return contactRepository.findAll()
+            .stream()
+            .map(contactMapper::contactToContactDto)
+            .toList();
     }
 
     @Override
     public ContactDto findContactByPhone(String phone) {
-        return contacts.getOrDefault(phone, null);
+
+        return contactMapper.contactToContactDto(
+        contactRepository.findContactByPhone(phone)
+            .orElseThrow(() ->
+                new NullPointerException("Contact with phone " + phone + " not found")));
     }
 
     @Override
     public ContactDto updateContactByPhone(String phone, ContactDto contactDto) {
-        return contacts.put(phone, contactDto);
+
+        Contact contact = contactRepository.findContactByPhone(phone)
+            .orElseThrow(() -> new NullPointerException("Contact with phone " + phone + " not found"));
+
+        contactMapper.updateContact(contactDto, contact);
+
+        return contactMapper.contactToContactDto(contactRepository.save(contact));
     }
 
     @Override
     public ContactDto createContact(ContactDto contactDto) {
-        return contacts.put(contactDto.getPhone(), contactDto);
+        return contactMapper.contactToContactDto(
+          contactRepository.save(contactMapper.contactDtoToContact(contactDto))
+        );
     }
 
     @Override
     public void deleteContactByPhone(String phone) {
-        contacts.remove(phone);
+        Contact contact = contactRepository.findContactByPhone(phone)
+            .orElseThrow(() -> new NullPointerException("Contact with phone " + phone + " not found"));
+        contactRepository.delete(contact);
     }
 }

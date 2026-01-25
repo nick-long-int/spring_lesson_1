@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ContactDto {
+    private Long id;
     private String lastName;
     private String firstName;
     private String middleName;
