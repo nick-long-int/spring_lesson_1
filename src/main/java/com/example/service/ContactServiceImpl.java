@@ -6,6 +6,9 @@ import com.example.model.Contact;
 import com.example.repo.ContactRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +19,11 @@ public class ContactServiceImpl implements ContactService {
     private final ContactMapper contactMapper;
 
     @Override
+    @Transactional(
+        readOnly = true,
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
     public List<ContactDto> findAll() {
         return contactRepository.findAll()
             .stream()
@@ -24,6 +32,11 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    @Transactional(
+        readOnly = true,
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
     public ContactDto findContactByPhone(String phone) {
 
         return contactMapper.contactToContactDto(
@@ -33,6 +46,10 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
     public ContactDto updateContactByPhone(String phone, ContactDto contactDto) {
 
         Contact contact = contactRepository.findContactByPhone(phone)
@@ -44,6 +61,10 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
     public ContactDto createContact(ContactDto contactDto) {
         return contactMapper.contactToContactDto(
           contactRepository.save(contactMapper.contactDtoToContact(contactDto))
@@ -51,6 +72,10 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
     public void deleteContactByPhone(String phone) {
         Contact contact = contactRepository.findContactByPhone(phone)
             .orElseThrow(() -> new NullPointerException("Contact with phone " + phone + " not found"));
