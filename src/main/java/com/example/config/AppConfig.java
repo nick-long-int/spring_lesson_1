@@ -12,7 +12,7 @@ public class AppConfig {
 
     @Bean
     public Map<String, ContactDto> myContactMap(){
-        return new HashMap<String, ContactDto>();
+        return new HashMap<>();
     }
 
 }
