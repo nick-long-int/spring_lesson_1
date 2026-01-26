@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.dto.ContactDto;
 import com.example.service.ContactService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,26 +22,31 @@ public class ContactController {
 
     private final ContactService contactService;
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ContactDto createContact(@RequestBody ContactDto contactDto) {
         return contactService.createContact(contactDto);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{phone}")
     public ContactDto findContactByPhone(@PathVariable String phone){
         return contactService.findContactByPhone(phone);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<ContactDto> findAllContacts(){
         return contactService.findAll();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/{phone}")
     public ContactDto updateContact(@PathVariable String phone, @RequestBody ContactDto contactDto){
         return contactService.updateContactByPhone(phone, contactDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{phone}")
     public void deleteContact(@PathVariable String phone){
         contactService.deleteContactByPhone(phone);
