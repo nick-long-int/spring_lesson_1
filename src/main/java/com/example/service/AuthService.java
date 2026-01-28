@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.dto.AuthRequest;
 import com.example.dto.AuthResponse;
+import com.example.kafka.KafkaStreamBridge;
 import com.example.model.User;
 import com.example.model.UserRole;
 import com.example.repo.UserRepo;
@@ -23,6 +24,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtValidator jwtValidator;
     private final JwtProducer jwtProducer;
+    private final KafkaStreamBridge bridge;
 
     @Transactional(
         isolation = Isolation.READ_COMMITTED,
@@ -43,6 +45,7 @@ public class AuthService {
         authResponse.setId(savedUser.getId());
         authResponse.setToken(token);
 
+        bridge.sendUserWasRegister("producer-out-0", authRequest.getUsername());
         return authResponse;
     }
 
