@@ -41,7 +41,8 @@ public class AuthConfig {
             .authorizeHttpRequests(
                 auth -> auth
                     .requestMatchers(
-                        "/auth/**"
+                        "/auth/**",
+                        "/answers/time"
                     ).permitAll()
                     .anyRequest()
                     .authenticated()
