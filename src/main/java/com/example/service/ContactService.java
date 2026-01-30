@@ -1,7 +1,13 @@
 package com.example.service;
 
-import org.springframework.core.io.Resource;
+import com.example.dto.ContactDto;
+
+import java.util.List;
 
 public interface ContactService {
-    String findAll();
+    List<ContactDto> findAll();
+    ContactDto findContactByPhone(String phone);
+    ContactDto updateContactByPhone(String phone, ContactDto contactDto);
+    ContactDto createContact(ContactDto contactDto);
+    void deleteContactByPhone(String phone);
 }

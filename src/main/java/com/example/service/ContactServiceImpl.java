@@ -1,35 +1,84 @@
 package com.example.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
+import com.example.dto.ContactDto;
+import com.example.mapper.ContactMapper;
+import com.example.model.Contact;
+import com.example.repo.ContactRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.List;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
+    private final ContactRepository contactRepository;
+    private final ContactMapper contactMapper;
 
-    private final Resource resource;
-
-    public ContactServiceImpl(@Value("${contact.path}")Resource resource) {
-        this.resource = resource;
+    @Override
+    @Transactional(
+        readOnly = true,
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
+    public List<ContactDto> findAll() {
+        return contactRepository.findAll()
+            .stream()
+            .map(contactMapper::contactToContactDto)
+            .toList();
     }
 
     @Override
-    public String findAll() {
-        try {
-            BufferedReader reader = new BufferedReader(
-                new InputStreamReader(resource.getInputStream())
-            );
-            StringBuilder sb = new StringBuilder();
+    @Transactional(
+        readOnly = true,
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
+    public ContactDto findContactByPhone(String phone) {
 
-            reader.lines().forEach(line -> sb.append(line).append("\n"));
+        return contactMapper.contactToContactDto(
+        contactRepository.findContactByPhone(phone)
+            .orElseThrow(() ->
+                new NullPointerException("Contact with phone " + phone + " not found")));
+    }
 
-            return sb.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
+    public ContactDto updateContactByPhone(String phone, ContactDto contactDto) {
+
+        Contact contact = contactRepository.findContactByPhone(phone)
+            .orElseThrow(() -> new NullPointerException("Contact with phone " + phone + " not found"));
+
+        contactMapper.updateContact(contactDto, contact);
+
+        return contactMapper.contactToContactDto(contactRepository.save(contact));
+    }
+
+    @Override
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
+    public ContactDto createContact(ContactDto contactDto) {
+        return contactMapper.contactToContactDto(
+          contactRepository.save(contactMapper.contactDtoToContact(contactDto))
+        );
+    }
+
+    @Override
+    @Transactional(
+        isolation = Isolation.READ_COMMITTED,
+        propagation = Propagation.REQUIRED
+    )
+    public void deleteContactByPhone(String phone) {
+        Contact contact = contactRepository.findContactByPhone(phone)
+            .orElseThrow(() -> new NullPointerException("Contact with phone " + phone + " not found"));
+        contactRepository.delete(contact);
     }
 }
